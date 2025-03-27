@@ -22,3 +22,7 @@ To compile the program, use the following command:
 
 ```bash
 g++ -std=c++11 -o textSearch textSearch.cpp -pthread
+
+run the file with the word you need to search
+
+─ ./textSearch sample.txt "pizza" 4  
