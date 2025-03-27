@@ -21,7 +21,7 @@ This program performs a parallel search for a keyword in a text file. It can fin
 To compile the program, use the following command:
 
 ```bash
-g++ -std=c++11 -o textSearch textSearch.cpp -pthread
+g++ -std=c++11 or uese C++17 -o textSearch textSearch.cpp -pthread
 
 run the file with the word you need to search
 
