@@ -108,7 +108,7 @@ void searchFile(const string &filename, const string &keyword, Trie &trie, vecto
         ++line_number;
 
         // Ensure the line contains the keyword or is within Levenshtein distance.
-        if (line.find(keyword) != string::npos || levenshteinDistance(line, keyword) <= 2) { // first half before ot is ensure that
+        if (line.find(keyword) != string::npos || levenshteinDistance(line, keyword) <= 4) { // first half before ot is ensure that
              // line contain exact keyword  and secode check if line line with in levestine distace 
             lock_guard<mutex> lock(file_mutex);  // Ensure thread-safe access to the results vector
             // Ensure the line is unique (avoid duplicates)
