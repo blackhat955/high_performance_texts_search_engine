@@ -49,7 +49,7 @@ Single-threaded search took: 0.0315 seconds.
 ```bash
 Mode	                                  Time Taken
 Single Thread	                          ~0.03 sec
-Multi Thread (4)                       	~0.01 sec
+Multi Thread (4)                          ~0.01 sec
 
 ```
 
