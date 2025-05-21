@@ -17,7 +17,7 @@ This program performs a parallel search for a keyword in a text file. It can fin
 - **g++ Compiler**: You need the `g++` compiler to compile the program. Ensure that it supports C++11 or later and that it has threading capabilities enabled.
 
 ## Working
-![Alt text](relative/path/to/image.png)
+![Alt text](diagram.png)
 
 ## Compilation
 
