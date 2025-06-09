@@ -52,6 +52,10 @@ public:
         // time
         // searching is not modify the trie so 
         // we use share lock over here 
+        // this allow the mutiple search at the same time and improve the performace significantly
+        // since we don't neew to modified naything over here dob;t needt ot use unique ptr which block the othere 
+        // thread which only wannt to read the data especiall reduce 
+        // reduce the performance if may thread searching for thing a the smae time 
         shared_lock lock(trie_mutex);
         
         // satrt form th e  root node 
@@ -79,6 +83,9 @@ int levenshteinDistance(const string &s1, const string &s2) {
     
     for (size_t i = 1; i <= s1.size(); ++i) {
         for (size_t j = 1; j <= s2.size(); ++j) {
+            //If the characters match, no operation is needed
+            //Just carry forward the previous result dp[i][j] = dp[i-1][j-1]
+            
             if (s1[i - 1] == s2[j - 1]) {// base case: no operation is needed
                 dp[i][j] = dp[i - 1][j - 1];  // distace remain same as previous on
             } else {
@@ -127,7 +134,7 @@ void parallelSearch(const string &filename, const string &keyword, int thread_co
     vector<string> results;
     vector<thread> threads;
     for (int i = 0; i < thread_count; ++i) {
-        threads.emplace_back(searchFile, filename, keyword, ref(trie), ref(results));
+        threads.emplace_back(searchFile, filename, keyword, ref(trie), ref(results));// assign chunks to file for the seraching using thre prallel serach
     }
     
     for (auto &t : threads) { // this enssur that all thread 
