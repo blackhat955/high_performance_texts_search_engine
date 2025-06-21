@@ -56,6 +56,9 @@ public:
         // since we don't neew to modified naything over here dob;t needt ot use unique ptr which block the othere 
         // thread which only wannt to read the data especiall reduce 
         // reduce the performance if may thread searching for thing a the smae time 
+
+        // Uses shared_lock (from <shared_mutex>), which allows multiple concurrent readers but blocks writers.
+        // Searching doesn't modify the Trie, so it's safe to let many threads search at the same time.
         shared_lock lock(trie_mutex);
         
         // satrt form th e  root node 
@@ -115,7 +118,7 @@ void searchFile(const string &filename, const string &keyword, Trie &trie, vecto
         ++line_number;
 
         // Ensure the line contains the keyword or is within Levenshtein distance.
-        if (line.find(keyword) != string::npos || levenshteinDistance(line, keyword) <= 4) { // first half before ot is ensure that
+        if (line.find(keyword) != -1 || levenshteinDistance(line, keyword) <= 4) { // first half before ot is ensure that
              // line contain exact keyword  and secode check if line line with in levestine distace 
             lock_guard<mutex> lock(file_mutex);  // Ensure thread-safe access to the results vector
             // Ensure the line is unique (avoid duplicates)
@@ -134,6 +137,7 @@ void parallelSearch(const string &filename, const string &keyword, int thread_co
     vector<string> results;
     vector<thread> threads;
     for (int i = 0; i < thread_count; ++i) {
+        // this meand multiple thread can work simulteneoully and because of it we pass the reference of th trie and result so each thread has these attributes
         threads.emplace_back(searchFile, filename, keyword, ref(trie), ref(results));// assign chunks to file for the seraching using thre prallel serach
     }
     
