@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Performance Search Engine</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f7; color: #1d1d1f; }
+        h1 { text-align: center; color: #1d1d1f; }
+        .search-container { background: white; padding: 30px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 40px; }
+        input[type="text"] { width: 100%; padding: 15px; font-size: 18px; border: 1px solid #d2d2d7; border-radius: 12px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        input[type="text"]:focus { border-color: #0071e3; }
+        button { background-color: #0071e3; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 20px; cursor: pointer; transition: background-color 0.2s; width: 100%; }
+        button:hover { background-color: #0077ed; }
+        #results { margin-top: 30px; }
+        .result-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #0071e3; box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease-in; }
+        .no-results { text-align: center; color: #86868b; margin-top: 20px; }
+        .stats { font-size: 12px; color: #86868b; text-align: right; margin-top: 5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <h1>⚡️ High Performance Search</h1>
+    
+    <div class="search-container">
+        <input type="text" id="query" placeholder="Type to search (e.g., 'performance', 'weather', 'hello')..." autofocus>
+        <button onclick="performSearch()">Search</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const input = document.getElementById("query");
+        input.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                performSearch();
+            }
+        });
+
+        async function performSearch() {
+            const query = input.value.trim();
+            const resultsDiv = document.getElementById("results");
+            
+            if (!query) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="no-results">Searching...</div>';
+            
+            try {
+                const startTime = performance.now();
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+
+                resultsDiv.innerHTML = '';
+
+                if (data.results && data.results.length > 0) {
+                    const stats = `<div class="stats">Found ${data.results.length} results in ${duration}ms</div>`;
+                    resultsDiv.innerHTML = stats;
+                    
+                    data.results.forEach(line => {
+                        const div = document.createElement('div');
+                        div.className = 'result-item';
+                        div.textContent = line;
+                        resultsDiv.appendChild(div);
+                    });
+                } else {
+                    resultsDiv.innerHTML = '<div class="no-results">No results found. Try "performance" or "weather".</div>';
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="no-results" style="color: red">Error: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

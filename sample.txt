@@ -10,3 +10,5 @@ C++ is powerful for low-level memory manipulation.
 The weather is nice today. Let's go for a walk.
 Searching through structured data is efficient.
 File I/O can be a bottleneck in many systems.
+Hello world! This is a test line for the search engine.
+Welcome to the high performance text search engine demo.
