@@ -15,10 +15,16 @@ SearchEngine::~SearchEngine() {}
 void SearchEngine::InsertToTrie(const std::string& word) {
     std::shared_ptr<TrieNode> current = trie_root_;
     for (char ch : word) {
-        if (current->children.find(ch) == current->children.end()) {
-            current->children[ch] = std::make_shared<TrieNode>();
+        auto it = std::find_if(current->children.begin(), current->children.end(), 
+            [ch](const std::pair<char, std::shared_ptr<TrieNode>>& p) { return p.first == ch; });
+
+        if (it == current->children.end()) {
+            auto newNode = std::make_shared<TrieNode>();
+            current->children.push_back({ch, newNode});
+            current = newNode;
+        } else {
+            current = it->second;
         }
-        current = current->children[ch];
     }
     current->is_end_of_word = true;
 }
@@ -85,7 +91,7 @@ void SearchTrie(std::shared_ptr<TrieNode> node, char ch, const std::string& curr
     }
 
     if (min_val <= threshold) {
-        for (auto& pair : node->children) {
+        for (const auto& pair : node->children) {
             SearchTrie(pair.second, pair.first, current_word + pair.first, query, currentRow, matched_words, threshold);
         }
     }
@@ -101,7 +107,7 @@ std::vector<std::string> SearchEngine::Search(const std::string& query, int thre
     std::iota(currentRow.begin(), currentRow.end(), 0);
 
     // Start recursion from root children
-    for (auto& pair : trie_root_->children) {
+    for (const auto& pair : trie_root_->children) {
         std::string start_char_str(1, pair.first);
         SearchTrie(pair.second, pair.first, start_char_str, query, currentRow, matched_words, threshold);
     }

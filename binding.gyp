@@ -12,8 +12,8 @@
         "src"
       ],
       "defines": [ "NAPI_CPP_EXCEPTIONS" ],
-      "cflags": [ "-fexceptions", "-std=c++17" ],
-      "cflags_cc": [ "-std=c++17", "-fexceptions" ],
+      "cflags": [ "-fexceptions", "-std=c++17", "-Wall", "-Wextra" ],
+      "cflags_cc": [ "-std=c++17", "-fexceptions", "-Wall", "-Wextra" ],
       "conditions": [
         ['OS=="mac"', {
           "xcode_settings": {

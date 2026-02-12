@@ -8,7 +8,13 @@
 #include <mutex>
 
 struct TrieNode {
-    std::unordered_map<char, std::shared_ptr<TrieNode>> children;
+    // Optimization: Use vector for children instead of unordered_map
+    // Since we mostly deal with ASCII, a vector of size 128 or 256 is faster and uses less memory overhead
+    // than a hash map for dense nodes. For sparse nodes, a vector of pairs might be better, 
+    // but let's stick to a simple vector optimization first.
+    // However, to be truly memory efficient for sparse nodes, we can use a sorted vector of pairs.
+    
+    std::vector<std::pair<char, std::shared_ptr<TrieNode>>> children;
     bool is_end_of_word = false;
 };
 

@@ -5,30 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High Performance Search Engine</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f7; color: #1d1d1f; }
-        h1 { text-align: center; color: #1d1d1f; }
-        .search-container { background: white; padding: 30px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 40px; }
-        input[type="text"] { width: 100%; padding: 15px; font-size: 18px; border: 1px solid #d2d2d7; border-radius: 12px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        input[type="text"]:focus { border-color: #0071e3; }
-        button { background-color: #0071e3; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 20px; cursor: pointer; transition: background-color 0.2s; width: 100%; }
-        button:hover { background-color: #0077ed; }
-        #results { margin-top: 30px; }
-        .result-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #0071e3; box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease-in; }
-        .no-results { text-align: center; color: #86868b; margin-top: 20px; }
-        .stats { font-size: 12px; color: #86868b; text-align: right; margin-top: 5px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        body { 
+            font-family: monospace; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #1e1e1e; 
+            color: #d4d4d4; 
+        }
+        h1 { 
+            text-align: left; 
+            color: #569cd6; 
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+        .stat-item { 
+            text-align: left; 
+        }
+        .stat-label { 
+            font-size: 12px; 
+            color: #808080; 
+            margin-bottom: 5px;
+            display: block;
+        }
+        .stat-value { 
+            font-size: 16px; 
+            color: #4ec9b0; 
+        }
+        
+        .search-container { 
+            margin-top: 20px; 
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] { 
+            flex-grow: 1;
+            background: #252526; 
+            border: 1px solid #3c3c3c; 
+            color: #d4d4d4;
+            padding: 10px; 
+            font-family: monospace;
+            font-size: 14px;
+        }
+        input[type="text"]:focus { 
+            outline: 1px solid #007fd4; 
+        }
+        
+        button { 
+            background-color: #0e639c; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-family: monospace;
+        }
+        button:hover { 
+            background-color: #1177bb; 
+        }
+
+        #results { 
+            margin-top: 20px; 
+            font-size: 13px;
+        }
+        .result-item { 
+            padding: 5px 0; 
+            border-bottom: 1px solid #333; 
+            color: #ce9178;
+        }
+        .no-results { color: #808080; }
+        
+        .status-ok { color: #6a9955; }
+        .status-warn { color: #dcdcaa; }
+        .status-err { color: #f48771; }
     </style>
 </head>
 <body>
-    <h1>High Performance Search</h1>
+    <h1>> ./High_Performance_Search_Engine_Cpp_Levenshtein</h1>
     
+    <div class="dashboard">
+        <div class="stat-item">
+            <span class="stat-label">MEMORY_RSS</span>
+            <span class="stat-value" id="ram-usage">-- MB</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">LATENCY_SINGLE</span>
+            <span class="stat-value" id="latency">-- ms</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">LATENCY_MULTI (AVG)</span>
+            <span class="stat-value" id="latency-multi">-- ms</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">STATUS</span>
+            <span class="stat-value status-ok" id="status-text">INIT</span>
+        </div>
+    </div>
+
     <div class="search-container">
-        <input type="text" id="query" placeholder="Type to search (e.g., 'performance', 'weather', 'hello')..." autofocus>
-        <button onclick="performSearch()">Search</button>
+        <div class="input-group">
+            <input type="text" id="query" placeholder="grep pattern (e.g., 'fast', 'search', 'algorithm')..." autofocus>
+            <button onclick="performSearch()">EXECUTE</button>
+        </div>
         <div id="results"></div>
     </div>
 
     <script>
+        // Dashboard Polling
+        setInterval(async () => {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                
+                const ramEl = document.getElementById('ram-usage');
+                ramEl.textContent = `${data.rss} MB`;
+                
+                if (parseFloat(data.rss) > 200) {
+                    ramEl.className = 'stat-value status-err';
+                } else {
+                    ramEl.className = 'stat-value status-ok';
+                }
+
+                document.getElementById('latency').textContent = `${data.lastSearchDuration || '--'} ms`;
+                document.getElementById('latency-multi').textContent = `${data.lastMultiThreadDuration || '--'} ms`;
+                
+                const statusText = document.getElementById('status-text');
+                statusText.textContent = data.mode.toUpperCase();
+                if (data.mode === 'Debug') {
+                    statusText.className = 'stat-value status-warn';
+                } else {
+                    statusText.className = 'stat-value status-ok';
+                }
+            } catch (e) {
+                console.error("Monitor failed", e);
+            }
+        }, 1000);
+
         const input = document.getElementById("query");
         input.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
@@ -45,34 +169,32 @@
                 return;
             }
 
-            resultsDiv.innerHTML = '<div class="no-results">Searching...</div>';
+            resultsDiv.innerHTML = '<div class="no-results">Processing...</div>';
+            
+            // Trigger benchmark in background
+            fetch(`/benchmark?q=${encodeURIComponent(query)}`).catch(console.error);
             
             try {
-                const startTime = performance.now();
                 const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
-                const endTime = performance.now();
-                const duration = (endTime - startTime).toFixed(2);
 
                 resultsDiv.innerHTML = '';
 
                 if (data.results && data.results.length > 0) {
-                    const stats = `<div class="stats">Found ${data.results.length} results in ${duration}ms</div>`;
-                    resultsDiv.innerHTML = stats;
-                    
                     data.results.forEach(line => {
                         const div = document.createElement('div');
                         div.className = 'result-item';
-                        div.textContent = line;
+                        div.textContent = `> ${line}`;
                         resultsDiv.appendChild(div);
                     });
                 } else {
-                    resultsDiv.innerHTML = '<div class="no-results">No results found. Try "performance" or "weather".</div>';
+                    resultsDiv.innerHTML = '<div class="no-results">exit code 1: no matches found</div>';
                 }
             } catch (err) {
-                resultsDiv.innerHTML = `<div class="no-results" style="color: red">Error: ${err.message}</div>`;
+                resultsDiv.innerHTML = `<div class="no-results status-err">Error: ${err.message}</div>`;
             }
         }
     </script>
+
 </body>
 </html>
