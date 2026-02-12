@@ -1,6 +1,6 @@
 # High Performance C++ Search Engine (Levenshtein Distance)
 
-Hey there! 👋 This is a high-performance text search engine I built using C++ and Node.js.
+Hey there! This is a high-performance text search engine I built using C++ and Node.js.
 
 I wanted to create something that wasn't just fast, but also smart enough to handle typos. So, I implemented a **Trie data structure** combined with the **Levenshtein Distance** algorithm (for fuzzy matching) in C++. To make it usable on the web, I wrapped the C++ core in a Node.js addon using `node-addon-api`.
 
@@ -61,4 +61,4 @@ I wanted to experiment with **Hybrid Architectures**—using C++ for the heavy l
 Feel free to poke around the code!
 
 ---
-*Built with ☕ and C++*
+*Built with C++*
